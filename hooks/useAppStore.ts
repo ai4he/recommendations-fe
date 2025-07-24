@@ -138,6 +138,7 @@ type AppStore = {
 
   clearUsers: () => void;
   clearTasks: () => void;
+  resetApp: () => void;
 
   recommendedTasks: Recommendation[];
   setRecommendedTasks: (result: Recommendation[]) => void;
@@ -488,6 +489,26 @@ export const useAppStore = create<AppStore>()(
 
         console.log("getTakenTaskIds - Unique task IDs:", uniqueTaskIds);
         return uniqueTaskIds;
+      },
+
+      // 4.14. Reset the entire application state to initial values and clear localStorage
+      resetApp: () => {
+        // Clear all data from the store, keep users
+        const users = get().users;
+        const tasks = get().tasks;
+        set({
+          users,
+          tasks: tasks.map((task) => ({
+            ...task,
+            completed: false,
+            feedback: undefined,
+            uploadedFileUrl: undefined,
+          })),
+          oldTaskCycles: [],
+          feedbackHistory: [],
+          userSkills: [],
+          recommendedTasks: [],
+        });
       },
     }),
 

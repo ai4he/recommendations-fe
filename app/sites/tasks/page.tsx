@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Recommendation, useAppStore } from "@/hooks/useAppStore";
 import { useRouter } from "next/navigation";
-import { Clock, FileText, Lock, CheckCircle } from "lucide-react";
+import { Clock, FileText, Lock, CheckCircle, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { initialTasks } from "@/data/initialTasks";
 import { advancedTasks } from "@/data/advancedTasks";
@@ -128,10 +128,18 @@ export default function TasksPage() {
   const feedbackHistory = useAppStore((state) => state.feedbackHistory);
 
   const router = useRouter();
+  const resetApp = useAppStore((state) => state.resetApp);
   const cycleNumber = feedbackHistory.length;
   const [isLoadingRecommendations, setIsLoadingRecommendations] =
     useState(false);
   const [isNavigatingAway, setIsNavigatingAway] = useState(false);
+
+  const handleStartOver = () => {
+    if (confirm('Are you sure you want to start over? This will clear all your progress and reset the application.')) {
+      resetApp();
+      window.location.href = '/sites/tasks'; // Force a full page reload to reset the state
+    }
+  };
 
   // Check if we should redirect to feedback page
   useEffect(() => {
@@ -365,6 +373,14 @@ export default function TasksPage() {
             Select a task to start earning money
           </p>
         </div>
+        <Button
+          variant="outline"
+          onClick={handleStartOver}
+          className="flex items-center gap-2"
+        >
+          <RotateCcw className="h-4 w-4" />
+          Start Over
+        </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
