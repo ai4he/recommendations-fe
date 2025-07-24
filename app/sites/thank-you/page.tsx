@@ -1,133 +1,83 @@
 "use client";
 
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { useAppStore } from "@/hooks/useAppStore";
+import { useEffect } from "react";
 
 export default function ThankYouPage() {
-  const oldTaskCycles = useAppStore((s) => s.oldTaskCycles);
-  const feedbackHistory = useAppStore((s) => s.feedbackHistory);
-  const userSkills = useAppStore((s) => s.userSkills);
+  const router = useRouter();
+  
+  // Get the current state from the store
+  const appState = useAppStore.getState();
+  const { users, tasks, oldTaskCycles, feedbackHistory, recommendedTasks, userSkills } = appState;
+
+  const handleGoHome = () => {
+    router.push("/");
+  };
+
+  // Automatically download data when component mounts
+  useEffect(() => {
+    // Function to download data as JSON
+    const downloadData = () => {
+      // Create a data object with all the state we want to save
+      const data = {
+        users,
+        tasks,
+        oldTaskCycles,
+        feedbackHistory,
+        recommendedTasks,
+        userSkills,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : null,
+          screenResolution: typeof window !== 'undefined' 
+            ? `${window.screen.width}x${window.screen.height}` 
+            : null,
+        }
+      };
+
+      // Create a blob with the data
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      // Create a temporary anchor element and trigger download
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `app-data-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    };
+
+    // Execute the download
+    downloadData();
+  }, [users, tasks, oldTaskCycles, feedbackHistory, recommendedTasks, userSkills]);
 
   return (
-    <div className="min-h-screen px-6 py-24 bg-white text-center space-y-8">
-      <div className="max-w-xl mx-auto space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold text-black">
-          🎉 Thank You!
-        </h1>
-        <p className="text-lg text-gray-600">
-          You’ve completed all assigned tasks. We appreciate your effort!
-        </p>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] p-6 text-center"
+    >
+      <h1 className="text-5xl font-bold text-gray-900 mb-4">Thank You!</h1>
+      <p className="text-xl text-gray-700 mb-8">
+        Your participation is greatly appreciated. Your data has been downloaded automatically.
+      </p>
 
-      <div className="w-full max-w-4xl mx-auto bg-gray-50 border rounded-md p-6 text-left space-y-6">
-        {/* Task summary */}
-        <div>
-          <h2 className="text-xl font-semibold mb-2 text-black">
-            🗂️ Task Summary
-          </h2>
-          <p className="text-sm text-gray-700 mb-2">
-            You completed {oldTaskCycles.flat().length} tasks across{" "}
-            {oldTaskCycles.length} cycles.
-          </p>
-          <ul className="list-disc ml-5 text-sm text-gray-600 space-y-1">
-            {oldTaskCycles.map((cycle, i) => (
-              <li key={i}>
-                <strong>Cycle {i + 1}:</strong>{" "}
-                {cycle.filter((t) => t.completed).length} completed tasks
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Feedback summary */}
-        <div>
-          <h2 className="text-xl font-semibold mb-2 text-black">
-            📝 Feedback Summary
-          </h2>
-          <ul className="space-y-2 text-sm text-gray-700">
-            {feedbackHistory.map((entry, i) => (
-              <li key={i} className="bg-white p-3 rounded border">
-                <strong>Cycle {i + 1}:</strong> &quot;
-                {entry.generalFeedback.comment}&quot; —{" "}
-                <span className="text-yellow-600">
-                  ★ {entry.generalFeedback.rating}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Skills summary */}
-        {userSkills.length > 0 && (
-          <div>
-            <h2 className="text-xl font-semibold mb-2 text-black">
-              🧠 Selected Skills
-            </h2>
-            <p className="text-sm text-gray-700">
-              Based on your selection, we matched you with tasks related to:
-            </p>
-            <ul className="flex flex-wrap gap-2 mt-2">
-              {userSkills.map((skill) => (
-                <li
-                  key={skill}
-                  className="bg-black text-white px-3 py-1 rounded-full text-xs"
-                >
-                  {skill}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Submitted answers */}
-        <div>
-          <h2 className="text-xl font-semibold mb-2 text-black">
-            📎 Submitted Responses
-          </h2>
-          {oldTaskCycles.map((cycle, i) => (
-            <div key={i} className="mb-4">
-              <h3 className="font-semibold text-gray-800 mb-2">
-                Cycle {i + 1}
-              </h3>
-              <ul className="space-y-2 text-sm">
-                {cycle
-                  .filter((t) => t.completed && t.uploadedFileUrl)
-                  .map((task) => (
-                    <li
-                      key={task.id}
-                      className="bg-white p-3 rounded border flex flex-col"
-                    >
-                      <span className="font-medium text-gray-900">
-                        {task.name}
-                      </span>
-                      {task.submissionType === "file" &&
-                      task.uploadedFileUrl?.startsWith("blob:") ? (
-                        <span className="text-gray-600">
-                          Submitted a file (local preview only)
-                        </span>
-                      ) : task.submissionType === "file" ? (
-                        <a
-                          href={task.uploadedFileUrl}
-                          className="text-blue-600 underline"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          📄 View uploaded file
-                        </a>
-                      ) : (
-                        <p className="text-gray-700 whitespace-pre-wrap mt-1">
-                          ✍️ {task.uploadedFileUrl}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-500 mt-1 italic">
-                        Submitted via: {task.submissionType}
-                      </p>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+      <Button
+        onClick={handleGoHome}
+        className="py-3 px-8 text-lg bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-md transition duration-200"
+      >
+        Prolific link
+      </Button>
+    </motion.div>
   );
 }

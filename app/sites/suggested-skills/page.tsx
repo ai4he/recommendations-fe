@@ -35,9 +35,16 @@ function SuggestedSkillsPage() {
   const [selected, setSelected] = useState<string[]>([]);
 
   const handleSelect = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    );
+    setSelected((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((s) => s !== id);
+      }
+      if (prev.length >= 3) {
+        alert('You can select up to 3 skills only.');
+        return prev;
+      }
+      return [...prev, id];
+    });
   };
 
   const setUserSkills = useAppStore((s) => s.setUserSkills);

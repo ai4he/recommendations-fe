@@ -13,6 +13,7 @@ function TaskDetailPage() {
   const router = useRouter();
   const tasks = useAppStore((state) => state.tasks);
   const uploadTaskFile = useAppStore((state) => state.uploadTaskFile);
+  const addFeedbackToTask = useAppStore((state) => state.addFeedbackToTask);
 
   const taskId = searchParams.get("id");
   const task = tasks.find((task) => task.id === taskId);
@@ -20,27 +21,50 @@ function TaskDetailPage() {
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState({ comment: "", rating: 0 });
 
   useEffect(() => {
     if (task) {
       setSuccess(!!task.completed);
       setFilePreviewUrl(task.uploadedFileUrl ?? null);
+      if (task.feedback) {
+        setFeedback(task.feedback);
+      }
     }
   }, [task]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !task) return;
 
     const completedCount = tasks.filter((t) => t.completed).length;
     const feedbackHistory = useAppStore.getState().feedbackHistory;
-    const cycleNumber = feedbackHistory.length;
+    const currentCycleIndex = feedbackHistory.length;
 
-    if (completedCount >= 3) {
-      if (cycleNumber === 0 || cycleNumber === 1 || cycleNumber === 2) {
+    // Solo redirigir si:
+    // 1. Tenemos 3 o más tareas completadas
+    // 2. Estamos en los ciclos 0, 1, o 2
+    // 3. No estamos ya en la página de feedback
+    const isOnFeedbackPage = window.location.pathname.includes("feedback");
+    const shouldRedirect =
+      completedCount >= 3 && currentCycleIndex < 3 && !isOnFeedbackPage;
+
+    console.log("TaskDetail - Navigation check:", {
+      completedCount,
+      currentCycleIndex,
+      currentPath: window.location.pathname,
+      isOnFeedbackPage,
+      shouldRedirect,
+    });
+
+    if (shouldRedirect) {
+      console.log("TaskDetail - Redirecting to feedback page");
+      // Pequeño delay para permitir que la tarea se complete
+      const timer = setTimeout(() => {
         router.push("/sites/feedback");
-      }
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [tasks, router]);
+  }, [tasks, router, task]);
 
   if (!task) return <p className="p-6 text-red-500">Task not found</p>;
 
@@ -64,7 +88,7 @@ function TaskDetailPage() {
     setTimeout(() => {
       setUploading(false);
       setSuccess(true);
-      uploadTaskFile(task.id, url, "file");
+      uploadTaskFile(task.id, task.numId,url, "file");
     }, 1500);
   };
 
@@ -74,7 +98,7 @@ function TaskDetailPage() {
       return;
     }
     setSuccess(true);
-    uploadTaskFile(task.id, filePreviewUrl, "text");
+    uploadTaskFile(task.id, task.numId, filePreviewUrl, "text");
   };
 
   const goBack = () => {
@@ -198,9 +222,66 @@ function TaskDetailPage() {
 
         {/* Confirmation */}
         {success && (
-          <p className="text-green-600 mt-4 font-semibold animate-pulse">
-            ✅ Submission successful! Task completed.
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <p className="text-green-600 mt-4 font-semibold animate-pulse">
+              ✅ Submission successful! Task completed.
+            </p>
+
+            {/* Feedback Form */}
+            <div className="mt-6 space-y-4 p-4 border-t border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Task Feedback
+              </h2>
+              <p className="text-sm text-gray-600">
+                How was your experience with this task?
+              </p>
+
+              {/* Star Rating */}
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <motion.button
+                    key={star}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setFeedback({ ...feedback, rating: star })}
+                    className={`text-3xl ${
+                      feedback.rating >= star
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  >
+                    ★
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* Comment Box */}
+              <textarea
+                placeholder="Share your thoughts..."
+                rows={4}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                value={feedback.comment}
+                onChange={(e) =>
+                  setFeedback({ ...feedback, comment: e.target.value })
+                }
+              />
+
+              <button
+                onClick={() => {
+                  addFeedbackToTask(task.id, feedback);
+                  // router.back();
+                }}
+                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition disabled:bg-gray-400"
+                disabled={!feedback.rating || !feedback.comment}
+              >
+                Submit Feedback
+              </button>
+            </div>
+          </motion.div>
         )}
       </div>
     </motion.div>

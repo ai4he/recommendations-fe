@@ -36,13 +36,13 @@ export const TaskSchema = z.object({
   type: z.enum([
     "transcription",
     "image_labeling",
-    "text_analysis",
+    "text_labeling",
     "voice_recording",
     "video_recording",
-    "survey",
+    "survey_response",
     "image",
     "document",
-    "audio"
+    "audio",
   ]),
   topic: z.string().optional(),
   duration: z.number().optional(), // duration in minutes
@@ -117,6 +117,7 @@ type AppStore = {
   unlockTask: (taskId: string) => void;
   uploadTaskFile: (
     taskId: string,
+    taskNumId: number,
     url: string,
     submissionType: "file" | "text"
   ) => void;
@@ -124,7 +125,11 @@ type AppStore = {
     taskId: string,
     feedback: { comment: string; rating: number }
   ) => void;
-  replaceTasks: (newTasks: Task[]) => void;
+  setTasks: (newTasks: Task[]) => void;
+  replaceTasks: (
+    newTasksDefinitions: Task[],
+    recommendations?: RecommendationResult
+  ) => void;
 
   archiveCurrentCycle: (generalFeedback?: {
     comment: string;
@@ -134,8 +139,8 @@ type AppStore = {
   clearUsers: () => void;
   clearTasks: () => void;
 
-  recommendedTasks: RecommendationResult;
-  setRecommendedTasks: (result: RecommendationResult) => void;
+  recommendedTasks: Recommendation[];
+  setRecommendedTasks: (result: Recommendation[]) => void;
 
   getTakenTaskIds: () => number[];
 };
@@ -216,17 +221,39 @@ export const useAppStore = create<AppStore>()(
           acceptedFormats: ["jpg", "png"],
           completed: false,
         },
+        {
+          id: uuidv4(),
+          numId: 6,
+          name: "Product Categorization",
+          description:
+            "Categorize products based on their images and descriptions.",
+          instructions:
+            "Review the product information and assign it to the most appropriate category from the provided list.",
+          price: 0.15,
+          locked: false,
+          type: "text_labeling",
+          acceptedFormats: ["jpg", "png", "txt"],
+          completed: false,
+        },
+        {
+          id: uuidv4(),
+          numId: 7,
+          name: "Data Entry from Receipt",
+          description: "Extract key information from a sales receipt.",
+          instructions:
+            "Enter the store name, date, total amount, and items purchased into the appropriate fields.",
+          price: 0.22,
+          locked: false,
+          type: "document",
+          acceptedFormats: ["pdf", "jpg", "png"],
+          completed: false,
+        },
       ],
 
       oldTaskCycles: [],
       feedbackHistory: [],
 
-      recommendedTasks: {
-      recommended: [],
-      blocked: [],
-      all_fair_tasks: [],
-      all_unfair_tasks: []
-    },
+      recommendedTasks: [],
 
       // ──────────────────────────────────────────────────────────────────────────
       // Acciones para actualizar el estado
@@ -279,7 +306,7 @@ export const useAppStore = create<AppStore>()(
 
       // 4.6. Subir un archivo o texto para la tarea y marcarla completada,
       //      luego desbloquear dependientes
-      uploadTaskFile: (taskId, url, submissionType) =>
+      uploadTaskFile: (taskId, taskNumId, url, submissionType) =>
         set((state) => {
           const updatedTasks = state.tasks.map((task) => {
             if (task.id === taskId) {
@@ -291,7 +318,7 @@ export const useAppStore = create<AppStore>()(
               };
             }
             // If this task depends on the recently completed one, we unlock it
-            if (task.locked && task.dependsOn === taskId) {
+            if (task.locked && task.dependsOn === taskNumId.toString()) {
               return { ...task, locked: false };
             }
             return task;
@@ -308,12 +335,99 @@ export const useAppStore = create<AppStore>()(
         })),
 
       // 4.8. Reemplazar todas las tareas actuales por un nuevo ciclo de tareas
-      replaceTasks: (newTasks) => set({ tasks: newTasks }),
+      setTasks: (newTasks) => set({ tasks: newTasks }),
+
+      replaceTasks: (newTasksDefinitions, recommendations) =>
+        set((state) => {
+          console.log(
+            "replaceTasks - New task definitions:",
+            newTasksDefinitions
+          );
+          console.log(
+            "replaceTasks - Received recommendations:",
+            recommendations
+          );
+
+          // Create a map of existing tasks by numId for quick lookup
+          const existingTasksMap = new Map(
+            state.tasks.map((task) => [task.numId, task])
+          );
+
+          console.log("replaceTasks - Existing tasks map:", existingTasksMap);
+
+          // Get recommended task IDs as a Set for O(1) lookups
+          const recommendedNumIds = new Set(
+            recommendations?.recommended?.map((r) => r.task) || []
+          );
+          console.log(
+            "replaceTasks - Recommended task IDs:",
+            Array.from(recommendedNumIds)
+          );
+
+          // Only unlock the first 3 recommended tasks, lock all others
+          const recommendedNumIdsArr = Array.from(recommendedNumIds);
+          const unlockedRecommendedNumIds = new Set(
+            recommendedNumIdsArr.slice(0, 3)
+          );
+
+          const updatedTasks = newTasksDefinitions.map((newTaskDef) => {
+            const existingTask = existingTasksMap.get(newTaskDef.numId);
+            const isRecommended = recommendedNumIds.has(newTaskDef.numId);
+            const isUnlockedRecommended = unlockedRecommendedNumIds.has(
+              newTaskDef.numId
+            );
+
+            const updatedTask = {
+              ...newTaskDef,
+              id: existingTask?.id || uuidv4(),
+              completed: false, // Reset completion status for the new cycle
+              locked: recommendations
+                ? !isUnlockedRecommended
+                : newTaskDef.locked,
+              feedback: undefined, // Reset feedback for the new cycle
+              uploadedFileUrl: undefined, // Reset file URL for the new cycle
+            };
+
+            console.log(`replaceTasks - Processed task ${newTaskDef.numId}:`, {
+              id: updatedTask.id,
+              completed: updatedTask.completed,
+              locked: updatedTask.locked,
+              isRecommended,
+              isUnlockedRecommended,
+            });
+
+            return updatedTask;
+          });
+
+          // Ensure we don't have duplicate task IDs
+          const taskIdSet = new Set(updatedTasks.map((t) => t.id));
+          if (taskIdSet.size !== updatedTasks.length) {
+            console.error("Duplicate task IDs detected in updated tasks!");
+          }
+
+          // Update recommended tasks, ensuring no duplicates
+          const newRecommendedTasks = recommendations?.recommended || [];
+          console.log(
+            "replaceTasks - Setting recommended tasks:",
+            newRecommendedTasks
+          );
+
+          return {
+            tasks: updatedTasks,
+            recommendedTasks: newRecommendedTasks,
+          };
+        }),
 
       // 4.9. Archivar el ciclo actual (todas las tareas) y guardar el feedback general
       archiveCurrentCycle: (generalFeedback) =>
         set((state) => {
-          // 4.9.1. Build FeedbackEntry array only with tasks that have feedback
+          console.log("archiveCurrentCycle called:", {
+            currentTasks: state.tasks.length,
+            feedbackHistoryLength: state.feedbackHistory.length,
+            generalFeedback,
+          });
+
+          // Build FeedbackEntry array only with tasks that have feedback
           const taskFeedbacks = state.tasks
             .filter((t) => t.feedback)
             .map((t) => ({
@@ -322,7 +436,7 @@ export const useAppStore = create<AppStore>()(
               rating: t.feedback!.rating,
             }));
 
-          return {
+          const newState = {
             oldTaskCycles: [...state.oldTaskCycles, state.tasks],
             feedbackHistory: [
               ...state.feedbackHistory,
@@ -331,7 +445,16 @@ export const useAppStore = create<AppStore>()(
                 generalFeedback: generalFeedback ?? { comment: "", rating: 0 },
               },
             ],
+            // NO limpiar recommendedTasks aquí si vamos a necesitarlos en el siguiente ciclo
+            // recommendedTasks: [],
           };
+
+          console.log("archiveCurrentCycle result:", {
+            newFeedbackHistoryLength: newState.feedbackHistory.length,
+            archivedTasks: state.tasks.length,
+          });
+
+          return newState;
         }),
 
       // 4.10. Vaciar lista de usuarios (por ejemplo, en logout)
@@ -345,18 +468,26 @@ export const useAppStore = create<AppStore>()(
       // 4.13. Obtener el array de numId de todas las tareas completadas,
       //       tanto del ciclo actual como de ciclos anteriores
       getTakenTaskIds: () => {
-        // 4.13.1. Tareas completadas en el ciclo actual
-        const currentDone = get()
-          .tasks.filter((t) => t.completed)
-          .map((t) => t.numId);
+        const state = get();
+        // Get completed tasks from current cycle
+        const completedInCurrentCycle = state.tasks
+          .filter((task) => task.completed)
+          .map((task) => task.numId);
 
-        // 4.13.2. Tareas completadas en ciclos anteriores (oldTaskCycles)
-        const oldDone = get()
-          .oldTaskCycles.flat()
-          .filter((t) => t.completed)
-          .map((t) => t.numId);
+        // Get completed tasks from all old cycles
+        const completedInOldCycles = state.oldTaskCycles.flatMap((cycleTasks) =>
+          cycleTasks.filter((task) => task.completed).map((task) => task.numId)
+        );
 
-        return [...oldDone, ...currentDone];
+        // Combine all completed task IDs and use a Set to ensure uniqueness
+        const allCompletedTaskIds = [
+          ...completedInCurrentCycle,
+          ...completedInOldCycles,
+        ];
+        const uniqueTaskIds = [...new Set(allCompletedTaskIds)];
+
+        console.log("getTakenTaskIds - Unique task IDs:", uniqueTaskIds);
+        return uniqueTaskIds;
       },
     }),
 
