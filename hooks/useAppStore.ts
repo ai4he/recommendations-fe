@@ -159,11 +159,11 @@ export const useAppStore = create<AppStore>()(
         {
           id: uuidv4(),
           numId: 1,
-          name: "Upload a Profile Picture",
-          description: "Help us personalize your experience.",
+          name: "Upload a Color Picture",
+          description: "Help us identify colors.",
           instructions:
-            "Upload a clear photo of yourself (no filters or sunglasses). This is only for internal verification and will not be shared.",
-          price: 0.1,
+            "Upload a picture with something that matches the color you are asked to identify.",
+          price: 0.25,
           locked: false,
           type: "image",
           acceptedFormats: ["jpg", "png", "jpeg"],
@@ -175,8 +175,8 @@ export const useAppStore = create<AppStore>()(
           name: "Verify Your Identity",
           description: "Help us ensure the integrity of the platform.",
           instructions:
-            "Upload a valid government-issued ID (e.g. passport, driver’s license, or national ID). Make sure all information is clearly visible.",
-          price: 0.25,
+            "Write down the same age as you have in the survey.",
+          price: 0.05,
           locked: false,
           type: "document",
           acceptedFormats: ["jpg", "png", "pdf"],
@@ -187,10 +187,10 @@ export const useAppStore = create<AppStore>()(
           numId: 3,
           name: "Proof of Education",
           description:
-            "Submit documentation of your highest level of education.",
+            "What is your highest level of education?",
           instructions:
-            "Upload your diploma, certificate, or transcript. This helps us match you with academic and professional tasks.",
-          price: 0.2,
+            "Tell us your highest level of education in simple words.",
+          price: 0.05,
           locked: false,
           type: "document",
           acceptedFormats: ["pdf", "jpg", "png"],
@@ -200,9 +200,9 @@ export const useAppStore = create<AppStore>()(
           id: uuidv4(),
           numId: 4,
           name: "Audio Sample",
-          description: "Submit a short voice recording.",
+          description: "Submit a transcription of the following audio.",
           instructions:
-            "Record yourself reading a provided paragraph out loud and upload the file. This helps us qualify you for audio-related tasks.",
+            "Read the audio and transcribe it word by word.",
           price: 0.18,
           locked: false,
           type: "audio",
@@ -212,14 +212,14 @@ export const useAppStore = create<AppStore>()(
         {
           id: uuidv4(),
           numId: 5,
-          name: "Handwriting Sample",
-          description: "Submit a photo of handwritten text.",
+          name: "Transcription Sample",
+          description: "Read the text and transcribe it.",
           instructions:
-            "Copy the provided text on a piece of paper and upload a photo of your handwriting. This may help us verify manual input quality.",
-          price: 0.12,
+            "Read carefully and transcribe the text word by word.",
+          price: 0.35,
           locked: false,
-          type: "image",
-          acceptedFormats: ["jpg", "png"],
+          type: "transcription",
+          acceptedFormats: ["txt"],
           completed: false,
         },
         {
@@ -227,10 +227,10 @@ export const useAppStore = create<AppStore>()(
           numId: 6,
           name: "Product Categorization",
           description:
-            "Categorize products based on their images and descriptions.",
+            "Categorize products based on their images",
           instructions:
-            "Review the product information and assign it to the most appropriate category from the provided list.",
-          price: 0.15,
+            "See the product image and categorize it",
+          price: 0.25,
           locked: false,
           type: "text_labeling",
           acceptedFormats: ["jpg", "png", "txt"],
@@ -242,7 +242,7 @@ export const useAppStore = create<AppStore>()(
           name: "Data Entry from Receipt",
           description: "Extract key information from a sales receipt.",
           instructions:
-            "Enter the store name, date, total amount, and items purchased into the appropriate fields.",
+            "Tell us the total amount of the receipt.",
           price: 0.22,
           locked: false,
           type: "document",

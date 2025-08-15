@@ -15,6 +15,28 @@ import { useEffect, useMemo, useState } from "react";
 import { initialTasks } from "@/data/initialTasks";
 import { advancedTasks } from "@/data/advancedTasks";
 
+const userSkillsMapping = {
+  transcription: "Medical Transcription",
+  image_labeling: "Image Labeling",
+  text_labeling: "Text Labeling",
+  voice_recording: "Voice Recording",
+  video_recording: "Video Recording",
+  survey_response: "Survey Response",
+  audio_processing: "Audio Processing",
+  medical_terminology: "Medical Terminology",
+  image_annotation: "Image Annotation",
+  data_entry: "Data Entry",
+  computer_vision: "Computer Vision",
+  content_analysis: "Content Analysis",
+  natural_language_processing: "Natural Language Processing",
+  ai_training: "AI Training",
+  content_moderation: "Content Moderation",
+  market_research: "Market Research",
+  legal_terminology: "Legal Terminology",
+  medical_image_segmentation: "Medical Image Segmentation",
+  social_media: "Social Media",
+};
+
 const getTaskTypeIcon = (type: string) => {
   switch (type) {
     case "transcription":
@@ -135,9 +157,13 @@ export default function TasksPage() {
   const [isNavigatingAway, setIsNavigatingAway] = useState(false);
 
   const handleStartOver = () => {
-    if (confirm('Are you sure you want to start over? This will clear all your progress and reset the application.')) {
+    if (
+      confirm(
+        "Are you sure you want to start over? This will clear all your progress and reset the application."
+      )
+    ) {
       resetApp();
-      window.location.href = '/sites/tasks'; // Force a full page reload to reset the state
+      window.location.href = "/sites/tasks"; // Force a full page reload to reset the state
     }
   };
 
@@ -370,7 +396,9 @@ export default function TasksPage() {
         <div>
           <h1 className="text-3xl font-bold">Available Tasks</h1>
           <p className="text-muted-foreground">
-            Select a task to start earning money
+            Select a task to start working (there won’t be an extra payment.
+            What you earned in the simulator won’t count towards your final
+            earnings)
           </p>
         </div>
         <Button
@@ -385,6 +413,7 @@ export default function TasksPage() {
 
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         {sortedTasks.map((task) => {
+          console.log({ task });
           return (
             <Card
               key={task.id}
@@ -396,11 +425,24 @@ export default function TasksPage() {
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-lg">{task.name}</CardTitle>
-                  {recommendedTaskIds.has(task.numId) && cycleNumber > 0 && (
-                    <span className="ml-2 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                      Recommended
-                    </span>
-                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {recommendedTaskIds.has(task.numId) && cycleNumber > 0 && (
+                      <>
+                        <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                          Recommended
+                        </span>
+                        <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                          Score: {recommendedTasks.find((t) => t.task === task.numId)?.score.toFixed(2)}
+                        </span>
+                        {task.locked && (
+                          <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                            Requires task #{task.dependsOn}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+
                   <div className="flex items-center gap-1">
                     {getTaskTypeIcon(task.type)}
                   </div>
@@ -446,6 +488,23 @@ export default function TasksPage() {
                   </div>
                 </div>
               </CardContent>
+              {userSkills.length > 0 && (
+                <div className="px-4 pb-2">
+                  <ul className="flex flex-wrap gap-2">
+                    {userSkills.map(
+                      (skill) =>
+                        task.requiredSkills?.includes(skill) && (
+                          <li 
+                            key={skill}
+                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors"
+                          >
+                            {userSkillsMapping[skill as keyof typeof userSkillsMapping]}
+                          </li>
+                        )
+                    )}
+                  </ul>
+                </div>
+              )}
               <CardFooter className="mt-auto pt-2">
                 <Button
                   onClick={(e) => {

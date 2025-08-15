@@ -2,12 +2,46 @@
 export const dynamic = "force-dynamic";
 
 import { useAppStore } from "@/hooks/useAppStore";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState, useCallback } from "react";
+import { StaticImageData } from "next/image";
 import { motion } from "framer-motion";
 import { UploadIcon, ArrowLeftIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
+// import all images from assets/tickets
+import receipt from "@/assets/tickets/1.jpg";
+import receipt2 from "@/assets/tickets/2.jpg";
+import receipt3 from "@/assets/tickets/3.webp";
+import receipt4 from "@/assets/tickets/4.jpg";
+import receipt5 from "@/assets/tickets/5.jpg";
 
+import product1 from "@/assets/products/1.jpg";
+import product2 from "@/assets/products/2.webp";
+import product3 from "@/assets/products/3.jpg";
+import product4 from "@/assets/products/4.jpg";
+import product5 from "@/assets/products/5.jpg";
+
+const hexColor = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "orange",
+  "purple",
+  "pink",
+  "brown",
+  "gray",
+  "black",
+  "white",
+];
+
+const audios = [1, 2, 3, 4, 5];
+
+const products = [product1, product2, product3, product4, product5];
+
+const receipts = [receipt, receipt2, receipt3, receipt4, receipt5];
+
+const tasksWithUpload = ["Upload a Color Picture"];
 function TaskDetailPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -22,6 +56,92 @@ function TaskDetailPage() {
   const [success, setSuccess] = useState(false);
   const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
   const [feedback, setFeedback] = useState({ comment: "", rating: 0 });
+  const [displayedSentences, setDisplayedSentences] = useState<string[]>([]);
+  const [selectedColor, setSelectedColor] = useState<string>("");
+  const [selectedReceipt, setSelectedReceipt] =
+    useState<StaticImageData | null>(null);
+  const [selectedProduct, setSelectedProduct] =
+    useState<StaticImageData | null>(null);
+  const [selectedAudio, setSelectedAudio] = useState<number | null>(null);
+
+  const shortSentences = useMemo(
+    () => [
+      "No parking",
+      "Keep off the grass",
+      "Beware of the dog",
+      "Please do not disturb",
+      "No trespassing",
+      "Private property",
+      "Do not enter",
+      "Caution wet floor",
+      "Slippery when wet",
+      "Yield to pedestrians",
+      "Do not block intersection",
+      "Do not park in front of hydrant",
+      "No smoking",
+      "Do not litter",
+      "Clean up after your pet",
+      "Do not make loud noises",
+      "Do not make excessive noise",
+      "Do not disturb the peace",
+      "Do not trespass",
+      "Do not loiter",
+      "Do not solicit",
+      "Do not panhandle",
+      "Do not beg",
+      "Do not vandalize",
+      "Do not pollute",
+      "Do not make a disturbance",
+      "Do not cause a disturbance",
+      "Do not make a nuisance",
+      "Do not cause a nuisance",
+      "Do not create a disturbance",
+      "Do not create a nuisance",
+      "Do not make a noise disturbance",
+      "Do not make a noise nuisance",
+      "Do not cause a noise disturbance",
+      "Do not cause a noise nuisance",
+      "Do not create a noise disturbance",
+      "Do not create a noise nuisance",
+    ],
+    []
+  );
+
+  // Memoize the random selection functions to prevent recreation on every render
+  const getRandomItem = useCallback(<T,>(items: T[]): T => {
+    return items[Math.floor(Math.random() * items.length)];
+  }, []);
+
+  // Set initial random values when component mounts or task changes
+  useEffect(() => {
+    if (!task) return;
+
+    switch (task.name) {
+      case "Transcription Sample":
+        setDisplayedSentences([
+          getRandomItem(shortSentences),
+          getRandomItem(shortSentences),
+        ]);
+        break;
+      case "Upload a Color Picture":
+        setSelectedColor(getRandomItem(hexColor));
+        break;
+      case "Receipt Sample":
+        setSelectedReceipt(getRandomItem(receipts));
+        break;
+      case "Product Categorization":
+      case "Image Labeling":
+        setSelectedProduct(getRandomItem(products));
+        break;
+      case "Audio Sample":
+      case "Audio Recording":
+      case "Voice Recording":
+        setSelectedAudio(getRandomItem(audios));
+        break;
+      default:
+        break;
+    }
+  }, [task, shortSentences, getRandomItem]);
 
   useEffect(() => {
     if (task) {
@@ -88,7 +208,7 @@ function TaskDetailPage() {
     setTimeout(() => {
       setUploading(false);
       setSuccess(true);
-      uploadTaskFile(task.id, task.numId,url, "file");
+      uploadTaskFile(task.id, task.numId, url, "file");
     }, 1500);
   };
 
@@ -139,44 +259,107 @@ function TaskDetailPage() {
         {task.instructions}
       </p>
 
+      {task.name === "Data Entry from Receipt" && (
+        <div className="flex items-center justify-center">
+          {selectedReceipt && (
+            <Image
+              src={selectedReceipt}
+              alt="Receipt"
+              width={400}
+              height={200}
+              className="object-contain"
+            />
+          )}
+        </div>
+      )}
+      {(task.name === "Product Categorization" ||
+        task.name === "Image Labeling") && (
+        <div className="flex items-center justify-center">
+          {selectedProduct && (
+            <Image
+              src={selectedProduct}
+              alt="Product"
+              width={400}
+              height={200}
+              className="object-contain"
+            />
+          )}
+        </div>
+      )}
+
+      {task.name === "Transcription Sample" && (
+        <p className="text-lg text-gray-600">
+          {displayedSentences[0]}
+          <br />
+          {displayedSentences[1]}
+        </p>
+      )}
+
+      {task.name === "Upload a Color Picture" && (
+        <div className="flex items-center justify-center">
+          <div
+            style={{
+              backgroundColor: selectedColor,
+            }}
+            className="w-48 h-48 rounded-full"
+          ></div>
+        </div>
+      )}
+
+      {task.name === "Audio Sample" && selectedAudio !== null && (
+        <div className="flex items-center justify-center">
+          <audio controls>
+            <track kind="captions" />
+            <source src={`/audios/${selectedAudio}.mp3`} type="audio/mp3" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      )}
+
       {/* Subida o texto */}
       <div className="mt-4 space-y-4">
         {!success && (
           <>
             {/* Subir archivo */}
-            <div className="space-y-2">
-              <input
-                type="file"
-                accept={task.acceptedFormats.map((ext) => `.${ext}`).join(",")}
-                onChange={handleFileChange}
-                className="hidden"
-                id="file-upload"
-              />
-              <label
-                htmlFor="file-upload"
-                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded cursor-pointer transition-all duration-200"
-              >
-                <UploadIcon />
-                {uploading ? "Uploading..." : "Upload File"}
-              </label>
-            </div>
+            {tasksWithUpload.includes(task.name) && (
+              <div className="space-y-2">
+                <input
+                  type="file"
+                  accept={task.acceptedFormats
+                    .map((ext) => `.${ext}`)
+                    .join(",")}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <label
+                  htmlFor="file-upload"
+                  className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded cursor-pointer transition-all duration-200"
+                >
+                  <UploadIcon />
+                  {uploading ? "Uploading..." : "Upload File"}
+                </label>
+              </div>
+            )}
 
             {/* Ingreso de texto */}
-            <div className="space-y-2">
-              <textarea
-                placeholder="Or write your response here..."
-                rows={4}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                value={filePreviewUrl ?? ""}
-                onChange={(e) => setFilePreviewUrl(e.target.value)}
-              />
-              <button
-                onClick={handleTextSubmit}
-                className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-neutral-800 transition"
-              >
-                Submit Text
-              </button>
-            </div>
+            {!tasksWithUpload.includes(task.name) && (
+              <div className="space-y-2">
+                <textarea
+                  placeholder="Write your response here..."
+                  rows={4}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  value={filePreviewUrl ?? ""}
+                  onChange={(e) => setFilePreviewUrl(e.target.value)}
+                />
+                <button
+                  onClick={handleTextSubmit}
+                  className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-neutral-800 transition"
+                >
+                  Submit Text
+                </button>
+              </div>
+            )}
 
             {/* Barra de progreso */}
             {uploading && (
@@ -273,7 +456,7 @@ function TaskDetailPage() {
               <button
                 onClick={() => {
                   addFeedbackToTask(task.id, feedback);
-                  // router.back();
+                  router.back();
                 }}
                 className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition disabled:bg-gray-400"
                 disabled={!feedback.rating || !feedback.comment}

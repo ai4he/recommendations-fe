@@ -105,7 +105,7 @@ export const advancedTasks: Task[] = [
     description: "Transcribe legal proceedings and documents with high accuracy.",
     instructions: "Ensure all legal terminology and details are transcribed precisely.",
     price: 3.0,
-    locked: true,
+    locked: false,
     type: "transcription",
     topic: "legal",
     duration: 30,
@@ -127,7 +127,7 @@ export const advancedTasks: Task[] = [
     duration: 22,
     numQuestions: 5,
     acceptedFormats: ["dicom", "png", "jpg"],
-    dependsOn: "107",
+    dependsOn: "101",
     completed: false,
     requiredSkills: ["image_annotation", "medical_terminology", "computer_vision"]
   },
@@ -144,7 +144,7 @@ export const advancedTasks: Task[] = [
     duration: 20,
     numQuestions: 4,
     acceptedFormats: ["pdf", "xlsx", "txt"],
-    dependsOn: "108",
+    dependsOn: "103",
     completed: false,
     requiredSkills: ["content_analysis", "data_analysis", "finance"]
   },
@@ -161,7 +161,7 @@ export const advancedTasks: Task[] = [
     duration: 28,
     numQuestions: 7,
     acceptedFormats: ["mp3", "wav"],
-    dependsOn: "109",
+    dependsOn: "107",
     completed: false,
     requiredSkills: ["transcription", "translation", "audio_processing"]
   },
@@ -178,7 +178,7 @@ export const advancedTasks: Task[] = [
     duration: 35,
     numQuestions: 8,
     acceptedFormats: ["las", "pcd"],
-    dependsOn: "110",
+    dependsOn: "102",
     completed: false,
     requiredSkills: ["image_annotation", "computer_vision", "machine_learning"]
   },
@@ -195,7 +195,7 @@ export const advancedTasks: Task[] = [
     duration: 40,
     numQuestions: 10,
     acceptedFormats: ["js", "ts", "py", "java"],
-    dependsOn: "111",
+    dependsOn: "109",
     completed: false,
     requiredSkills: ["software_development", "quality_assurance", "content_analysis"]
   }
