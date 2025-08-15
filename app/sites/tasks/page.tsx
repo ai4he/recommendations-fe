@@ -257,7 +257,7 @@ export default function TasksPage() {
 
         try {
           const response = await fetch(
-            "https://fastapi-ai-3yp0.onrender.com/api/recommend",
+            "http://13.221.139.11/api/recommend",
             {
               method: "POST",
               headers: {
