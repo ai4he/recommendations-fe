@@ -3,7 +3,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { z } from "zod";
-import { v4 as uuidv4 } from "uuid";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // 1. Definimos los schemata Zod para validar usuarios y tareas.
@@ -43,11 +42,13 @@ export const TaskSchema = z.object({
     "image",
     "document",
     "audio",
+    "selection",
   ]),
   topic: z.string().optional(),
   duration: z.number().optional(), // duration in minutes
   numQuestions: z.number().optional(), // number of questions
   acceptedFormats: z.array(z.string()),
+  cycle: z.enum(["beginner", "intermediate", "advanced"]).optional(),
   submissionType: z.enum(["file", "text"]).optional(),
   dependsOn: z.string().optional(),
   numId: z.number(), // Numeric ID for backend matching
@@ -157,7 +158,7 @@ export const useAppStore = create<AppStore>()(
 
       tasks: [
         {
-          id: uuidv4(),
+          id: "general-tag-1",
           numId: 1,
           name: "Upload a Color Picture",
           description: "Help us identify colors.",
@@ -170,12 +171,11 @@ export const useAppStore = create<AppStore>()(
           completed: false,
         },
         {
-          id: uuidv4(),
+          id: "general-tag-2",
           numId: 2,
           name: "Verify Your Identity",
           description: "Help us ensure the integrity of the platform.",
-          instructions:
-            "Write down the same age as you have in the survey.",
+          instructions: "Write down the same age as you have in the survey.",
           price: 0.05,
           locked: false,
           type: "document",
@@ -183,11 +183,10 @@ export const useAppStore = create<AppStore>()(
           completed: false,
         },
         {
-          id: uuidv4(),
+          id: "general-tag-3",
           numId: 3,
           name: "Proof of Education",
-          description:
-            "What is your highest level of education?",
+          description: "What is your highest level of education?",
           instructions:
             "Tell us your highest level of education in simple words.",
           price: 0.05,
@@ -197,12 +196,11 @@ export const useAppStore = create<AppStore>()(
           completed: false,
         },
         {
-          id: uuidv4(),
+          id: "general-tag-4",
           numId: 4,
           name: "Audio Sample",
           description: "Submit a transcription of the following audio.",
-          instructions:
-            "Read the audio and transcribe it word by word.",
+          instructions: "Read the audio and transcribe it word by word.",
           price: 0.18,
           locked: false,
           type: "audio",
@@ -210,12 +208,11 @@ export const useAppStore = create<AppStore>()(
           completed: false,
         },
         {
-          id: uuidv4(),
+          id: "general-tag-5",
           numId: 5,
           name: "Transcription Sample",
           description: "Read the text and transcribe it.",
-          instructions:
-            "Read carefully and transcribe the text word by word.",
+          instructions: "Read carefully and transcribe the text word by word.",
           price: 0.35,
           locked: false,
           type: "transcription",
@@ -223,13 +220,11 @@ export const useAppStore = create<AppStore>()(
           completed: false,
         },
         {
-          id: uuidv4(),
+          id: "general-tag-6",
           numId: 6,
           name: "Product Categorization",
-          description:
-            "Categorize products based on their images",
-          instructions:
-            "See the product image and categorize it",
+          description: "Categorize products based on their images",
+          instructions: "See the product image and categorize it",
           price: 0.25,
           locked: false,
           type: "text_labeling",
@@ -237,12 +232,11 @@ export const useAppStore = create<AppStore>()(
           completed: false,
         },
         {
-          id: uuidv4(),
+          id: "general-tag-7",
           numId: 7,
           name: "Data Entry from Receipt",
           description: "Extract key information from a sales receipt.",
-          instructions:
-            "Tell us the total amount of the receipt.",
+          instructions: "Tell us the total amount of the receipt.",
           price: 0.22,
           locked: false,
           type: "document",
@@ -378,9 +372,13 @@ export const useAppStore = create<AppStore>()(
               newTaskDef.numId
             );
 
+            if (!existingTask) {
+              return newTaskDef;
+            }
+
             const updatedTask = {
               ...newTaskDef,
-              id: existingTask?.id || uuidv4(),
+              id: existingTask.id,
               completed: false, // Reset completion status for the new cycle
               locked: recommendations
                 ? !isUnlockedRecommended

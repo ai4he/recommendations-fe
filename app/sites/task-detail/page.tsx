@@ -21,6 +21,39 @@ import product3 from "@/assets/products/3.jpg";
 import product4 from "@/assets/products/4.jpg";
 import product5 from "@/assets/products/5.jpg";
 
+import color1 from "@/assets/intermediate/colors/1.jpg";
+import color2 from "@/assets/intermediate/colors/2.jpg";
+import color3 from "@/assets/intermediate/colors/3.jpg";
+import color4 from "@/assets/intermediate/colors/4.jpg";
+import color5 from "@/assets/intermediate/colors/5.jpg";
+import color6 from "@/assets/intermediate/colors/6.jpg";
+import color7 from "@/assets/intermediate/colors/7.jpg";
+import color8 from "@/assets/intermediate/colors/8.jpg";
+import color9 from "@/assets/intermediate/colors/9.jpg";
+import color10 from "@/assets/intermediate/colors/10.jpg";
+import color11 from "@/assets/intermediate/colors/11.jpg";
+import color12 from "@/assets/intermediate/colors/12.jpg";
+import color13 from "@/assets/intermediate/colors/13.jpg";
+
+import medicalImage1 from "@/assets/intermediate/medical/1.jpg";
+import medicalImage2 from "@/assets/intermediate/medical/2.jpg";
+import medicalImage3 from "@/assets/intermediate/medical/3.jpg";
+import medicalImage4 from "@/assets/intermediate/medical/4.jpg";
+import medicalImage5 from "@/assets/intermediate/medical/5.jpg";
+import medicalImage6 from "@/assets/intermediate/medical/6.jpg";
+import medicalImage7 from "@/assets/intermediate/medical/7.jpg";
+import medicalImage8 from "@/assets/intermediate/medical/8.jpg";
+import medicalImage9 from "@/assets/intermediate/medical/9.jpg";
+import medicalImage10 from "@/assets/intermediate/medical/10.jpg";
+import medicalImage11 from "@/assets/intermediate/medical/11.jpg";
+import medicalImage12 from "@/assets/intermediate/medical/12.jpg";
+
+import productI1 from "@/assets/intermediate/products/1.jpg";
+import productI2 from "@/assets/intermediate/products/2.jpg";
+import productI3 from "@/assets/intermediate/products/3.jpg";
+import productI4 from "@/assets/intermediate/products/4.jpg";
+import productI5 from "@/assets/intermediate/products/5.jpg";
+
 const hexColor = [
   "red",
   "blue",
@@ -38,6 +71,45 @@ const hexColor = [
 const audios = [1, 2, 3, 4, 5];
 
 const products = [product1, product2, product3, product4, product5];
+
+const medicalImages = [
+  medicalImage1,
+  medicalImage2,
+  medicalImage3,
+  medicalImage4,
+  medicalImage5,
+  medicalImage6,
+  medicalImage7,
+  medicalImage8,
+  medicalImage9,
+  medicalImage10,
+  medicalImage11,
+  medicalImage12,
+];
+
+const colorsIntermediate = [
+  color1,
+  color2,
+  color3,
+  color4,
+  color5,
+  color6,
+  color7,
+  color8,
+  color9,
+  color10,
+  color11,
+  color12,
+  color13,
+];
+
+const productsIntermediate = [
+  productI1,
+  productI2,
+  productI3,
+  productI4,
+  productI5,
+];
 
 const receipts = [receipt, receipt2, receipt3, receipt4, receipt5];
 
@@ -62,7 +134,22 @@ function TaskDetailPage() {
     useState<StaticImageData | null>(null);
   const [selectedProduct, setSelectedProduct] =
     useState<StaticImageData | null>(null);
+  const [selectedMedicalImage, setSelectedMedicalImage] =
+    useState<StaticImageData | null>(null);
+
+  const [selectedProductIntermediate, setSelectedProductIntermediate] =
+    useState<StaticImageData | null>(null);
+
+  const [selectedColorIntermediate, setSelectedColorIntermediate] =
+    useState<StaticImageData | null>(null);
+
   const [selectedAudio, setSelectedAudio] = useState<number | null>(null);
+  const [hasInitializedRandom, setHasInitializedRandom] = useState(false);
+
+  const [selectedSentences, setSelectedSentences] = useState<string[]>([]);
+
+  const [selectedSurveyQuestion, setSelectedSurveyQuestion] =
+    useState<string>("");
 
   const shortSentences = useMemo(
     () => [
@@ -107,14 +194,76 @@ function TaskDetailPage() {
     []
   );
 
-  // Memoize the random selection functions to prevent recreation on every render
+  const positiveSentences = useMemo(
+    () => [
+      "I am so happy",
+      "You're so kind",
+      "I love you",
+      "You're so smart",
+      "You're so beautiful",
+      "You're so handsome",
+      "You're so cute",
+      "You're so funny",
+      "I love tacos!",
+      "I love pizza!",
+      "You're my best friend!",
+      "You're so sweet!",
+    ],
+    []
+  );
+
+  const negativeSentences = useMemo(
+    () => [
+      "I am so sad",
+      "You're so mean",
+      "I don't like you",
+      "You're so lazy",
+      "I don't like this place",
+      "I don't like tacos!",
+      "I don't like pizza!",
+      "You're not my best friend!",
+      "You're so sweet!",
+    ],
+    []
+  );
+
+  const surveyQuestions = useMemo(
+    () => [
+      "What is your favorite color?",
+      "What is your favorite food?",
+      "What is your favorite animal?",
+      "What is your favorite sport?",
+      "What is your favorite movie?",
+    ],
+    []
+  );
+
+  // Función para obtener un elemento aleatorio
   const getRandomItem = useCallback(<T,>(items: T[]): T => {
     return items[Math.floor(Math.random() * items.length)];
   }, []);
 
-  // Set initial random values when component mounts or task changes
+  // Efecto para limpiar los estados cuando cambia la tarea
   useEffect(() => {
-    if (!task) return;
+    // Resetear estados cuando cambia la tarea
+    setHasInitializedRandom(false);
+    setDisplayedSentences([]);
+    setSelectedColor("");
+    setSelectedReceipt(null);
+    setSelectedProduct(null);
+    setSelectedMedicalImage(null);
+    setSelectedProductIntermediate(null);
+    setSelectedColorIntermediate(null);
+    setSelectedAudio(null);
+    setFilePreviewUrl(null);
+    setSuccess(false);
+    setSelectedSentences([]);
+    setSelectedSurveyQuestion("");
+  }, [taskId]);
+
+  // Efecto para inicializar los elementos aleatorios
+  useEffect(() => {
+    if (!task || hasInitializedRandom) return;
 
     switch (task.name) {
       case "Transcription Sample":
@@ -126,22 +275,66 @@ function TaskDetailPage() {
       case "Upload a Color Picture":
         setSelectedColor(getRandomItem(hexColor));
         break;
+      case "Data Entry from Receipt":
       case "Receipt Sample":
+      case "Document Transcription":
+      case "Ticket Analysis":
         setSelectedReceipt(getRandomItem(receipts));
         break;
       case "Product Categorization":
       case "Image Labeling":
+      case "General Images":
+      case "Research Images":
         setSelectedProduct(getRandomItem(products));
         break;
       case "Audio Sample":
       case "Audio Recording":
       case "Voice Recording":
+      case "Audio Transcription":
         setSelectedAudio(getRandomItem(audios));
+        break;
+      case "Medical Image Labeling":
+      case "Medical Images":
+      case "Medical Equipment Categorization":
+      case "Medical Transcription":
+      case "High-Resolution Image Annotation":
+      case "Medical Image Identification":
+        setSelectedMedicalImage(getRandomItem(medicalImages));
+        break;
+      case "Survey: Product Preference":
+        setSelectedProductIntermediate(getRandomItem(productsIntermediate));
+        break;
+      case "Color Identification":
+      case "Object Annotation":
+      case "Product Image Categorization":
+      case "Research Image Annotation":
+        setSelectedColorIntermediate(getRandomItem(colorsIntermediate));
+        break;
+      case "Sentiment Analysis of Social Media Data":
+        setSelectedSentences([
+          getRandomItem(
+            Math.random() > 0.5 ? positiveSentences : negativeSentences
+          ),
+        ]);
+        break;
+      case "Survey Response":
+        setSelectedSurveyQuestion(getRandomItem(surveyQuestions));
         break;
       default:
         break;
     }
-  }, [task, shortSentences, getRandomItem]);
+
+    // Marcar como inicializado
+    setHasInitializedRandom(true);
+  }, [
+    task,
+    shortSentences,
+    getRandomItem,
+    hasInitializedRandom,
+    positiveSentences,
+    negativeSentences,
+    surveyQuestions,
+  ]);
 
   useEffect(() => {
     if (task) {
@@ -259,7 +452,10 @@ function TaskDetailPage() {
         {task.instructions}
       </p>
 
-      {task.name === "Data Entry from Receipt" && (
+      {(task.name === "Data Entry from Receipt" ||
+        task.name === "Receipt Sample" ||
+        task.name === "Document Transcription" ||
+        task.name === "Ticket Analysis") && (
         <div className="flex items-center justify-center">
           {selectedReceipt && (
             <Image
@@ -273,11 +469,64 @@ function TaskDetailPage() {
         </div>
       )}
       {(task.name === "Product Categorization" ||
-        task.name === "Image Labeling") && (
+        task.name === "Image Labeling" ||
+        task.name === "General Images" ||
+        task.name === "Research Images") && (
         <div className="flex items-center justify-center">
           {selectedProduct && (
             <Image
               src={selectedProduct}
+              alt="Product"
+              width={400}
+              height={200}
+              className="object-contain"
+            />
+          )}
+        </div>
+      )}
+
+      {task.name === "Survey: Product Preference" && (
+        <div className="flex items-center justify-center">
+          {selectedProductIntermediate && (
+            <Image
+              src={selectedProductIntermediate}
+              alt="Product"
+              width={400}
+              height={200}
+              className="object-contain"
+            />
+          )}
+        </div>
+      )}
+
+      {(task.name === "Color Identification" ||
+        task.name === "Object Annotation" ||
+        task.name === "Product Image Categorization" ||
+        task.name === "Research Image Annotation") && (
+        <div className="flex items-center justify-center">
+          {selectedColorIntermediate && (
+            <Image
+              src={selectedColorIntermediate}
+              alt="Product"
+              width={400}
+              height={200}
+              className="object-contain"
+            />
+          )}
+        </div>
+      )}
+
+      {(task.name === "Medical Image Labeling" ||
+        task.name === "Medical Images" ||
+        task.name === "Medical Image Categorization" ||
+        task.name === "Medical Equipment Categorization" ||
+        task.name === "Medical Transcription" ||
+        task.name === "High-Resolution Image Annotation" ||
+        task.name === "Medical Image Identification") && (
+        <div className="flex items-center justify-center">
+          {selectedMedicalImage && (
+            <Image
+              src={selectedMedicalImage}
               alt="Product"
               width={400}
               height={200}
@@ -295,6 +544,14 @@ function TaskDetailPage() {
         </p>
       )}
 
+      {task.name === "Sentiment Analysis of Social Media Data" && (
+        <p className="text-lg text-gray-600">{selectedSentences}</p>
+      )}
+
+      {task.name === "Survey Response" && (
+        <p className="text-lg text-gray-600">{selectedSurveyQuestion}</p>
+      )}
+
       {task.name === "Upload a Color Picture" && (
         <div className="flex items-center justify-center">
           <div
@@ -306,15 +563,19 @@ function TaskDetailPage() {
         </div>
       )}
 
-      {task.name === "Audio Sample" && selectedAudio !== null && (
-        <div className="flex items-center justify-center">
-          <audio controls>
-            <track kind="captions" />
-            <source src={`/audios/${selectedAudio}.mp3`} type="audio/mp3" />
-            Your browser does not support the audio element.
-          </audio>
-        </div>
-      )}
+      {(task.name === "Audio Sample" ||
+        task.name === "Audio Recording" ||
+        task.name === "Voice Recording" ||
+        task.name === "Audio Transcription") &&
+        selectedAudio !== null && (
+          <div className="flex items-center justify-center">
+            <audio controls>
+              <track kind="captions" />
+              <source src={`/audios/${selectedAudio}.mp3`} type="audio/mp3" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        )}
 
       {/* Subida o texto */}
       <div className="mt-4 space-y-4">

@@ -5,28 +5,8 @@ import { useState } from "react";
 import { suggestedSkills } from "@/data/suggestedSkills";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { v4 as uuidv4 } from "uuid";
 
-interface Task {
-  id: string;
-  numId: number;
-  topic: string;
-  name: string;
-  description: string;
-  instructions: string;
-  price: number;
-  type:
-    | "audio"
-    | "document"
-    | "image"
-    | "transcription"
-    | "video_recording"
-    | "voice_recording";
-  acceptedFormats: string[];
-  locked: boolean;
-  dependsOn?: string;
-  completed: boolean;
-}
+import { advancedTasks } from "@/data/advancedTasks";
 
 function SuggestedSkillsPage() {
   const replaceTasks = useAppStore((s) => s.replaceTasks);
@@ -40,7 +20,7 @@ function SuggestedSkillsPage() {
         return prev.filter((s) => s !== id);
       }
       if (prev.length >= 3) {
-        alert('You can select up to 3 skills only.');
+        alert("You can select up to 3 skills only.");
         return prev;
       }
       return [...prev, id];
@@ -56,37 +36,12 @@ function SuggestedSkillsPage() {
     }
 
     const generatedTasks = selected.flatMap((skill) => {
-      const taskIds = [uuidv4(), uuidv4(), uuidv4()];
+      // get tasks from advanced tasks and filter by skill
 
-      return taskIds.map(
-        (id, index): Task => ({
-          id,
-          numId: index + 1,
-          topic: skill,
-          name: `Skill Task ${index + 1} (${skill})`,
-          description: `Practice task for ${skill}`,
-          instructions: `Do something related to ${skill}`,
-          price: Math.random() * (2 - 0.2) + 0.2,
-          type: (() => {
-            const mediaTypes = [
-              "audio",
-              "document",
-              "image",
-              "transcription",
-              "video_recording",
-              "voice_recording",
-            ] as const;
-            type MediaType = (typeof mediaTypes)[number];
-            return mediaTypes[
-              Math.floor(Math.random() * mediaTypes.length)
-            ] as MediaType;
-          })(),
-          acceptedFormats: ["pdf", "txt"],
-          locked: index !== 0,
-          dependsOn: index > 0 ? taskIds[index - 1] : undefined,
-          completed: false,
-        })
-      );
+      const tasks = advancedTasks.filter((task) => {
+        return task.topic === skill;
+      });
+      return tasks;
     });
 
     setUserSkills(selected);
