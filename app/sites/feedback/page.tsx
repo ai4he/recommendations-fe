@@ -102,7 +102,7 @@ function FeedbackPage() {
 
       try {
         const response = await fetch(
-          "http://13.221.139.11/api/recommend",
+          "https://rec.haielab.org/api/recommend",
           {
             method: "POST",
             headers: {

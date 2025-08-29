@@ -257,7 +257,7 @@ export default function TasksPage() {
 
         try {
           const response = await fetch(
-            "http://13.221.139.11/api/recommend",
+            "https://rec.haielab.org/api/recommend",
             {
               method: "POST",
               headers: {
@@ -432,7 +432,10 @@ export default function TasksPage() {
                           Recommended
                         </span>
                         <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                          Score: {recommendedTasks.find((t) => t.task === task.numId)?.score.toFixed(2)}
+                          Score:{" "}
+                          {recommendedTasks
+                            .find((t) => t.task === task.numId)
+                            ?.score.toFixed(2)}
                         </span>
                         {task.locked && (
                           <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
@@ -494,11 +497,15 @@ export default function TasksPage() {
                     {userSkills.map(
                       (skill) =>
                         task.requiredSkills?.includes(skill) && (
-                          <li 
+                          <li
                             key={skill}
                             className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors"
                           >
-                            {userSkillsMapping[skill as keyof typeof userSkillsMapping]}
+                            {
+                              userSkillsMapping[
+                                skill as keyof typeof userSkillsMapping
+                              ]
+                            }
                           </li>
                         )
                     )}
