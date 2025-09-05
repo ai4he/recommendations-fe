@@ -350,8 +350,9 @@ function TaskDetailPage() {
     if (typeof window === "undefined" || !task) return;
 
     const completedCount = tasks.filter((t) => t.completed).length;
-    const feedbackHistory = useAppStore.getState().feedbackHistory;
-    const currentCycleIndex = feedbackHistory.length;
+    const currentCycleIndex = useAppStore
+      .getState()
+      .getCurrentCycle(); 
 
     // Solo redirigir si:
     // 1. Tenemos 3 o más tareas completadas

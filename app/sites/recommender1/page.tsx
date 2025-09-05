@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Recommendation, useAppStore } from "@/hooks/useAppStore";
 import { useRouter } from "next/navigation";
 import { Clock, FileText, Lock, CheckCircle, RotateCcw } from "lucide-react";
-import { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { initialTasks } from "@/data/initialTasks";
 import { advancedTasks } from "@/data/advancedTasks";
 
@@ -148,18 +148,18 @@ export default function TasksPage() {
   const setRecommendedTasks = useAppStore((state) => state.setRecommendedTasks);
   const userSkills = useAppStore((state) => state.userSkills);
   const feedbackHistory = useAppStore((state) => state.feedbackHistory);
+  const cycleNumber = useAppStore((s) => s.currentCycle);
 
   const router = useRouter();
   const resetApp = useAppStore((state) => state.resetApp);
-  const cycleNumber = useAppStore(s => s.currentCycle);
+
   const [isLoadingRecommendations, setIsLoadingRecommendations] =
     useState(false);
   const [isNavigatingAway, setIsNavigatingAway] = useState(false);
 
-  // Set entry point to "tasks" when this component mounts
   const { setEntryPoint } = useAppStore();
   useEffect(() => {
-    setEntryPoint("tasks");
+    setEntryPoint("recommender1");
   }, [setEntryPoint]);
 
 
@@ -429,15 +429,8 @@ export default function TasksPage() {
                         <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                           Recommended
                         </span>
-                        <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                          Score: {recommendedTasks.find((t) => t.task === task.numId)?.score.toFixed(2)}
-                        </span>
-                        {recommendedTasks.find((t) => t.task === task.numId)?.top_feature && (
-                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
-                            Picked for you because: {recommendedTasks.find((t) => t.task === task.numId)?.top_feature}
-                          </span>
-                        )}
-                        {task.locked && (
+
+                       {task.locked && (
                           <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
                             Requires task #{task.dependsOn}
                           </span>

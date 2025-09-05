@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { initialTasks } from "@/data/initialTasks";
 import { useEffect, useMemo, useState, useRef } from "react";
+import { advancedTasks } from "@/data/advancedTasks";
 
 function FeedbackPage() {
   const tasks = useAppStore((state) => state.tasks);
@@ -34,7 +35,7 @@ function FeedbackPage() {
 
   const router = useRouter();
 
-  const cycleNumber = useAppStore((state) => state.feedbackHistory.length);
+  const cycleNumber = useAppStore((s) => s.currentCycle);
 
   const prevCompletedTasksRef = useRef<Task[]>([]);
 
@@ -87,6 +88,15 @@ function FeedbackPage() {
     setIsSubmitting(true);
     archiveCurrentCycle(generalFeedback);
 
+    // added
+    // save the first three completed tasks as preferred tasks 
+    if (cycleNumber === 0) {
+      const chosenIds = completedTasks.slice(0, 3).map((t) => t.numId);
+      useAppStore.getState().setPreferredTasks(chosenIds);
+      console.log("Saved preferred tasks:", chosenIds);
+    }
+    
+
     if (cycleNumber === 1 || cycleNumber === 2) {
       const taken_tasks = getTakenTaskIds();
       const tasks_payload = initialTasks.map((task) => ({
@@ -102,7 +112,7 @@ function FeedbackPage() {
 
       try {
         const response = await fetch(
-          "https://rec.haielab.org/api/recommend",
+          "http://13.221.139.11/api/recommend",
           {
             method: "POST",
             headers: {
@@ -168,14 +178,31 @@ function FeedbackPage() {
           // Después del primer ciclo, reemplazar con initialTasks y ir a tasks
           console.log("replacing tasks with initialTasks", { initialTasks });
           replaceTasks(initialTasks);
-          router.push("/sites/tasks");
+          //router.push("/sites/tasks");
+          router.push("/sites/thank-you");
         } else if (cycleNumber === 2) {
           console.log("FeedbackPage - Cycle 2: Going to suggested-skills");
-          // Después del segundo ciclo, ir a suggested-skills
-          router.push("/sites/suggested-skills");
+          // back to the entry point page
+          const entryPoint = useAppStore.getState().getEntryPoint();
+          console.log("Entry point is:", entryPoint);
+          if (entryPoint === "tasks") {
+            router.push("/sites/thank-you");
+          } else if (entryPoint === "recommender1") {
+            replaceTasks(advancedTasks);
+            router.push("/sites/recommender1");
+          } else if (entryPoint === "recommender2") {
+            replaceTasks(advancedTasks);
+            router.push("/sites/recommender2");
+          } else {
+            console.warn("Unknown entry point, defaulting to /sites/tasks");
+            router.push("/sites/tasks");
+          }          
         } else if (cycleNumber >= 3) {
           console.log("FeedbackPage - Cycle 3+: Going to thank-you");
           // Después del tercer ciclo o más, ir a thank-you
+          // set cycleNumber back to 0 for a new session
+          useAppStore.getState().setCurrentCycle(1);
+          replaceTasks(initialTasks);
           router.push("/sites/thank-you");
         }
       } catch (error) {
@@ -281,7 +308,7 @@ function FeedbackPage() {
             You haven’t completed any tasks yet.
           </p>
           <a
-            href="/sites/tasks"
+            href=""
             className="inline-block bg-black text-white px-4 py-2 rounded-md font-medium hover:bg-neutral-800 transition"
           >
             🔙 Go to Tasks
@@ -294,7 +321,7 @@ function FeedbackPage() {
             feedback.
           </p>
           <a
-            href="/sites/tasks"
+            href=""
             className="inline-block bg-black text-white px-4 py-2 rounded-md font-medium hover:bg-neutral-800 transition"
           >
             🔙 Go to Tasks

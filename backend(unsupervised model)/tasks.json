@@ -1,0 +1,606 @@
+[
+  {
+    "id": "general-tag-1",
+    "numId": 1,
+    "name": "Upload a Color Picture",
+    "description": "Help us identify colors.",
+    "instructions": "Upload a picture with something that matches the color you are asked to identify.",
+    "price": 0.25,
+    "locked": false,
+    "type": "image",
+    "topic": "data_entry",
+    "duration": 20,
+    "acceptedFormats": [
+      "jpg",
+      "png",
+      "jpeg"
+    ],
+    "completed": false
+  },
+  {
+    "id": "general-tag-2",
+    "numId": 2,
+    "name": "Verify Your Identity",
+    "description": "Help us ensure the integrity of the platform.",
+    "instructions": "Write down the same age as you have in the survey.",
+    "price": 0.05,
+    "locked": false,
+    "type": "document",
+    "topic": "data_entry",
+    "duration": 5,
+    "acceptedFormats": [
+      "jpg",
+      "png",
+      "pdf"
+    ],
+    "completed": false
+  },
+  {
+    "id": "general-tag-3",
+    "numId": 3,
+    "name": "Proof of Education",
+    "description": "What is your highest level of education?",
+    "instructions": "Tell us your highest level of education in simple words.",
+    "price": 0.05,
+    "locked": false,
+    "type": "document",
+    "topic": "data_entry",
+    "duration": 10,
+    "acceptedFormats": [
+      "pdf",
+      "jpg",
+      "png"
+    ],
+    "completed": false
+  },
+  {
+    "id": "general-tag-4",
+    "numId": 4,
+    "name": "Audio Sample",
+    "description": "Submit a transcription of the following audio.",
+    "instructions": "Read the audio and transcribe it word by word.",
+    "price": 0.18,
+    "locked": false,
+    "type": "audio",
+    "topic": "audio_processing",
+    "duration": 10,
+    "acceptedFormats": [
+      "mp3",
+      "wav",
+      "m4a"
+    ],
+    "completed": false
+  },
+  {
+    "id": "general-tag-5",
+    "numId": 5,
+    "name": "Transcription Sample",
+    "description": "Read the text and transcribe it.",
+    "instructions": "Read carefully and transcribe the text word by word.",
+    "price": 0.35,
+    "locked": false,
+    "type": "transcription",
+    "topic": "content_analysis",
+    "duration": 30,
+    "acceptedFormats": [
+      "txt"
+    ],
+    "completed": false
+  },
+  {
+    "id": "general-tag-6",
+    "numId": 6,
+    "name": "Product Categorization",
+    "description": "Categorize products based on their images",
+    "instructions": "See the product image and categorize it",
+    "price": 0.25,
+    "locked": false,
+    "type": "text_labeling",
+    "topic": "ecommerce",
+    "duration": 8,
+    "acceptedFormats": [
+      "jpg",
+      "png",
+      "txt"
+    ],
+    "completed": false
+  },
+  {
+    "id": "general-tag-7",
+    "numId": 7,
+    "name": "Data Entry from Receipt",
+    "description": "Extract key information from a sales receipt.",
+    "instructions": "Tell us the total amount of the receipt.",
+    "price": 0.22,
+    "locked": false,
+    "type": "document",
+    "topic": "data_entry",
+    "duration": 20,
+    "acceptedFormats": [
+      "pdf",
+      "jpg",
+      "png"
+    ],
+    "completed": false
+  },
+  {
+    "numId": 8,
+    "id": "initial-image-medical-1",
+    "name": "Medical Images",
+    "description": "Label medical images based on their content.",
+    "instructions": "Analyze each medical image and label it.",
+    "price": 1.5,
+    "locked": false,
+    "type": "image_labeling",
+    "topic": "medical",
+    "duration": 15,
+    "numQuestions": 1,
+    "acceptedFormats": [
+      "jpg",
+      "png",
+      "jpeg"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "medical_terminology",
+      "audio_processing"
+    ],
+    "cycle": "intermediate"
+  },
+  {
+    "numId": 9,
+    "id": "initial-image-general-2",
+    "name": "General Images",
+    "description": "Label general images based on their content.",
+    "instructions": "Analyze each general image and label it.",
+    "price": 0.8,
+    "locked": false,
+    "type": "image_labeling",
+    "topic": "general",
+    "duration": 10,
+    "numQuestions": 1,
+    "acceptedFormats": [
+      "jpg",
+      "png",
+      "jpeg"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "typing",
+      "listening"
+    ],
+    "cycle": "intermediate"
+  },
+  {
+    "numId": 10,
+    "id": "initial-image-research-3",
+    "name": "Research Images",
+    "description": "Label research images based on their content.",
+    "instructions": "Analyze each research image and label it.",
+    "price": 1.2,
+    "locked": true,
+    "type": "image_labeling",
+    "topic": "research",
+    "duration": 20,
+    "numQuestions": 1,
+    "acceptedFormats": [
+      "jpg",
+      "png",
+      "jpeg"
+    ],
+    "dependsOn": "1",
+    "completed": false,
+    "requiredSkills": [
+      "typing",
+      "attention_to_detail"
+    ],
+    "cycle": "intermediate"
+  },
+  {
+    "numId": 11,
+    "id": "initial-image-medical-4",
+    "name": "Medical Image Labeling",
+    "description": "Label medical images based on their content.",
+    "instructions": "Analyze the medical image and label it.",
+    "price": 0.9,
+    "locked": false,
+    "type": "image_labeling",
+    "topic": "medical",
+    "duration": 12,
+    "numQuestions": 2,
+    "acceptedFormats": [
+      "jpg",
+      "png",
+      "jpeg"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "image_annotation",
+      "medical_terminology"
+    ],
+    "cycle": "intermediate"
+  },
+  {
+    "numId": 12,
+    "id": "initial-image-ecommerce-5",
+    "name": "Product Image Categorization",
+    "description": "Categorize product images for our e-commerce platform.",
+    "instructions": "write the most appropriate category for the image.",
+    "price": 0.7,
+    "locked": false,
+    "type": "image_labeling",
+    "topic": "ecommerce",
+    "duration": 8,
+    "numQuestions": 3,
+    "acceptedFormats": [
+      "jpg",
+      "png"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "product_knowledge",
+      "categorization"
+    ],
+    "cycle": "intermediate"
+  },
+  {
+    "numId": 13,
+    "id": "initial-image-research-6",
+    "name": "Research Image Annotation",
+    "description": "Categorize images for machine learning research.",
+    "instructions": "write the most appropriate category for the image.",
+    "price": 1.1,
+    "locked": true,
+    "type": "image_labeling",
+    "topic": "research",
+    "duration": 15,
+    "numQuestions": 2,
+    "acceptedFormats": [
+      "jpg",
+      "png"
+    ],
+    "dependsOn": "4",
+    "completed": false,
+    "requiredSkills": [
+      "attention_to_detail",
+      "image_annotation"
+    ],
+    "cycle": "intermediate"
+  },
+  {
+    "numId": 14,
+    "id": "selection-research-7",
+    "name": "Color Identification",
+    "description": "Identify colors for our design research.",
+    "instructions": "write the color that best matches picture.",
+    "price": 0.4,
+    "locked": false,
+    "type": "image_labeling",
+    "topic": "research",
+    "duration": 5,
+    "numQuestions": 3,
+    "acceptedFormats": [
+      "selection"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "color_recognition"
+    ],
+    "cycle": "intermediate"
+  },
+  {
+    "numId": 15,
+    "id": "initial-selection-medical-8",
+    "name": "Medical Equipment Categorization",
+    "description": "Categorize images of medical equipment.",
+    "instructions": "write the most appropriate category for the image.",
+    "price": 0.6,
+    "locked": true,
+    "type": "image_labeling",
+    "topic": "medical",
+    "duration": 7,
+    "numQuestions": 2,
+    "acceptedFormats": [
+      "selection"
+    ],
+    "dependsOn": "4",
+    "completed": false,
+    "requiredSkills": [
+      "medical_terminology",
+      "categorization"
+    ],
+    "cycle": "intermediate"
+  },
+  {
+    "numId": 16,
+    "id": "initial-selection-ecommerce-9",
+    "name": "Survey: Product Preference",
+    "description": "Participate in a product preference survey.",
+    "instructions": "write the product you prefer from each set of options.",
+    "price": 0.5,
+    "locked": true,
+    "type": "image_labeling",
+    "topic": "ecommerce",
+    "duration": 6,
+    "numQuestions": 4,
+    "acceptedFormats": [
+      "selection"
+    ],
+    "dependsOn": "7",
+    "completed": false,
+    "requiredSkills": [
+      "product_knowledge",
+      "decision_making"
+    ],
+    "cycle": "intermediate"
+  },
+  {
+    "numId": 17,
+    "id": "advanced-medical-17",
+    "name": "Advanced Medical Transcription",
+    "description": "Transcribe larger medical audio with background noise.",
+    "instructions": "Transcribe accurately, noting language changes and speaker identification.",
+    "price": 2.5,
+    "locked": false,
+    "type": "transcription",
+    "topic": "medical_terminology",
+    "duration": 20,
+    "numQuestions": 5,
+    "acceptedFormats": [
+      "text"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "medical_terminology",
+      "audio_processing",
+      "transcription"
+    ]
+  },
+  {
+    "numId": 18,
+    "id": "advanced-image-18",
+    "name": "High-Resolution Image Annotation",
+    "description": "Annotate high-resolution images for object detection and segmentation.",
+    "instructions": "Precisely outline objects and categorize them according to guidelines.",
+    "price": 1.8,
+    "locked": false,
+    "type": "image_labeling",
+    "topic": "image_annotation",
+    "duration": 18,
+    "numQuestions": 4,
+    "dependsOn": "advanced-medical-17",
+    "acceptedFormats": [
+      "text"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "image_annotation",
+      "data_entry",
+      "computer_vision"
+    ]
+  },
+  {
+    "numId": 19,
+    "id": "advanced-text-19",
+    "name": "Sentiment Analysis of Sentece",
+    "description": "Analyze sentiment from the following sentence.",
+    "instructions": "Identify sentiment (positive, negative, neutral) and extract key themes from diverse social media content.",
+    "price": 1.2,
+    "locked": false,
+    "type": "text_labeling",
+    "topic": "content_analysis",
+    "duration": 15,
+    "numQuestions": 3,
+    "acceptedFormats": [
+      "text"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "content_analysis",
+      "natural_language_processing"
+    ]
+  },
+  {
+    "numId": 20,
+    "id": "advanced-voice-20",
+    "name": "Voice Transcription for AI Training",
+    "description": "Transcribe larger voice audio with background noise.",
+    "instructions": "Transcribe accurately, noting language changes and speaker identification.",
+    "price": 0.7,
+    "locked": false,
+    "type": "voice_recording",
+    "topic": "audio_processing",
+    "duration": 10,
+    "numQuestions": 2,
+    "dependsOn": "advanced-text-19",
+    "acceptedFormats": [
+      "text"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "audio_processing",
+      "voice_recognition"
+    ]
+  },
+  {
+    "numId": 21,
+    "id": "advanced-video-21",
+    "name": "Image Content Moderation",
+    "description": "Review and moderate image content for policy violations.",
+    "instructions": "Identify and flag inappropriate content based on community guidelines.",
+    "price": 1.5,
+    "locked": false,
+    "type": "image_labeling",
+    "topic": "image_annotation",
+    "duration": 25,
+    "numQuestions": 1,
+    "dependsOn": "advanced-image-18",
+    "acceptedFormats": [
+      "text"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "video_editing",
+      "content_analysis"
+    ]
+  },
+  {
+    "numId": 22,
+    "id": "advanced-survey-22",
+    "name": "Survey Response",
+    "description": "Respond to a survey.",
+    "instructions": "Respond to the question above.",
+    "price": 0.9,
+    "locked": false,
+    "type": "survey_response",
+    "topic": "survey_research",
+    "duration": 12,
+    "numQuestions": 5,
+    "acceptedFormats": [
+      "text"
+    ],
+    "completed": false,
+    "requiredSkills": [
+      "survey_research",
+      "data_analysis"
+    ]
+  },
+  {
+    "numId": 23,
+    "id": "advanced-legal-23",
+    "name": "Document Transcription",
+    "description": "Transcribe documents with high accuracy.",
+    "instructions": "Write down total and subtotal.",
+    "price": 3.0,
+    "locked": false,
+    "type": "transcription",
+    "topic": "content_analysis",
+    "duration": 30,
+    "numQuestions": 6,
+    "acceptedFormats": [
+      "text"
+    ],
+    "dependsOn": "advanced-voice-20",
+    "completed": false,
+    "requiredSkills": [
+      "transcription",
+      "content_analysis",
+      "audio_processing"
+    ]
+  },
+  {
+    "numId": 24,
+    "id": "advanced-image-24",
+    "name": "Medical Image Identification",
+    "description": "Identify medical images based on their content.",
+    "instructions": "Identify the medical image.",
+    "price": 2.8,
+    "locked": true,
+    "type": "image_labeling",
+    "topic": "medical_terminology",
+    "duration": 22,
+    "numQuestions": 5,
+    "acceptedFormats": [
+      "text"
+    ],
+    "dependsOn": "advanced-legal-23",
+    "completed": false,
+    "requiredSkills": [
+      "image_annotation",
+      "medical_terminology",
+      "computer_vision"
+    ]
+  },
+  {
+    "numId": 25,
+    "id": "advanced-finance-25",
+    "name": "Ticket Analysis",
+    "description": "Analyze tickets and extract key data points.",
+    "instructions": "Identify the ticket number, date, and time.",
+    "price": 2.0,
+    "locked": true,
+    "type": "text_labeling",
+    "topic": "data_entry",
+    "duration": 20,
+    "numQuestions": 4,
+    "acceptedFormats": [
+      "text"
+    ],
+    "dependsOn": "advanced-survey-22",
+    "completed": false,
+    "requiredSkills": [
+      "content_analysis",
+      "data_analysis",
+      "finance"
+    ]
+  },
+  {
+    "numId": 26,
+    "id": "advanced-multilingual-26",
+    "name": "Audio Transcription",
+    "description": "Transcribe audio recordings.",
+    "instructions": "Transcribe accurately.",
+    "price": 3.5,
+    "locked": true,
+    "type": "transcription",
+    "topic": "audio_processing",
+    "duration": 28,
+    "numQuestions": 7,
+    "acceptedFormats": [
+      "text"
+    ],
+    "dependsOn": "advanced-voice-20",
+    "completed": false,
+    "requiredSkills": [
+      "transcription",
+      "translation",
+      "audio_processing"
+    ]
+  },
+  {
+    "numId": 27,
+    "id": "advanced-3d-27",
+    "name": "Object Annotation",
+    "description": "Provide a detailed description of the object.",
+    "instructions": "Provide a detailed description of the object.",
+    "price": 4.0,
+    "locked": true,
+    "type": "image_labeling",
+    "topic": "data_entry",
+    "duration": 35,
+    "numQuestions": 8,
+    "acceptedFormats": [
+      "text"
+    ],
+    "dependsOn": "advanced-image-18",
+    "completed": false,
+    "requiredSkills": [
+      "image_annotation",
+      "computer_vision",
+      "machine_learning"
+    ]
+  },
+  {
+    "numId": 28,
+    "id": "advanced-code-28",
+    "name": "Code function",
+    "description": "Write a function that solves a problem.",
+    "instructions": "Write a function that can add and multiply two numbers.",
+    "price": 5.0,
+    "locked": true,
+    "type": "text_labeling",
+    "topic": "data_entry",
+    "duration": 40,
+    "numQuestions": 10,
+    "acceptedFormats": [
+      "text"
+    ],
+    "dependsOn": "advanced-text-19",
+    "completed": false,
+    "requiredSkills": [
+      "software_development",
+      "quality_assurance",
+      "content_analysis"
+    ]
+  }
+]

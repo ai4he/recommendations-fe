@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Recommendation, useAppStore } from "@/hooks/useAppStore";
 import { useRouter } from "next/navigation";
 import { Clock, FileText, Lock, CheckCircle, RotateCcw } from "lucide-react";
-import { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { initialTasks } from "@/data/initialTasks";
 import { advancedTasks } from "@/data/advancedTasks";
 
@@ -148,18 +148,17 @@ export default function TasksPage() {
   const setRecommendedTasks = useAppStore((state) => state.setRecommendedTasks);
   const userSkills = useAppStore((state) => state.userSkills);
   const feedbackHistory = useAppStore((state) => state.feedbackHistory);
-
+  const cycleNumber = useAppStore((s) => s.currentCycle);
   const router = useRouter();
   const resetApp = useAppStore((state) => state.resetApp);
-  const cycleNumber = useAppStore(s => s.currentCycle);
+
   const [isLoadingRecommendations, setIsLoadingRecommendations] =
     useState(false);
   const [isNavigatingAway, setIsNavigatingAway] = useState(false);
 
-  // Set entry point to "tasks" when this component mounts
   const { setEntryPoint } = useAppStore();
   useEffect(() => {
-    setEntryPoint("tasks");
+    setEntryPoint("recommender1");
   }, [setEntryPoint]);
 
 
