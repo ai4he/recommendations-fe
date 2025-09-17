@@ -88,6 +88,8 @@ export type Recommendation = {
   topic: string;
   type: string;
   is_fair?: boolean;
+  //newly added
+  top_feature?: string | null;
 };
 
 export type RecommendationResult = {
@@ -145,6 +147,18 @@ type AppStore = {
   setRecommendedTasks: (result: Recommendation[]) => void;
 
   getTakenTaskIds: () => number[];
+
+  preferredTasks: number[];
+  getPreferredTasks: () => number[];
+  setPreferredTasks: (ids: number[]) => void;
+
+  entryPoint: "tasks" | "recommender1" | "recommender2" | null;
+  setEntryPoint: (page: "tasks" | "recommender1" | "recommender2") => void;
+  getEntryPoint: () => "tasks" | "recommender1" | "recommender2" | null;
+
+  currentCycle: number;
+  setCurrentCycle: (cycle: number) => void;
+  getCurrentCycle: () => number;
 };
 
 export const useAppStore = create<AppStore>()(
@@ -245,6 +259,18 @@ export const useAppStore = create<AppStore>()(
         },
       ],
 
+      preferredTasks: [],
+      getPreferredTasks: () => get().preferredTasks,
+      setPreferredTasks: (ids: number[]) => set({ preferredTasks: ids }),
+
+      entryPoint: null,
+      setEntryPoint: (page) => set({ entryPoint: page }),
+      getEntryPoint: () => get().entryPoint,
+
+      currentCycle: 0,
+      setCurrentCycle: (cycle) => set({ currentCycle: cycle }),
+      getCurrentCycle: () => get().currentCycle,  
+
       oldTaskCycles: [],
       feedbackHistory: [],
 
@@ -275,14 +301,18 @@ export const useAppStore = create<AppStore>()(
       // 4.4. Marcar tarea como completada y desbloquear dependientes
       completeTask: (taskId) =>
         set((state) => {
-          // 4.4.1. Actualizar la tarea completada
+          // Find the completed task to get its numId
+          const completedTask = state.tasks.find(task => task.id === taskId);
+          const completedNumId = completedTask?.numId?.toString();
+
+          // 4.4.1. Update the completed task
           const updatedTasks = state.tasks.map((task) =>
             task.id === taskId ? { ...task, completed: true } : task
           );
 
-          // 4.4.2. Unlock tasks that depended on this completed one
+          // 4.4.2. Unlock tasks that depend on this task (check both id and numId)
           const unlockedTasks = updatedTasks.map((task) => {
-            if (task.locked && task.dependsOn === taskId) {
+            if (task.locked && (task.dependsOn === taskId || task.dependsOn === completedNumId)) {
               return { ...task, locked: false };
             }
             return task;
@@ -312,8 +342,10 @@ export const useAppStore = create<AppStore>()(
                 submissionType,
               };
             }
-            // If this task depends on the recently completed one, we unlock it
-            if (task.locked && task.dependsOn === taskNumId.toString()) {
+            // If this task depends on the recently completed one (by id or numId), we unlock it
+            const completedTask = state.tasks.find(t => t.id === taskId);
+            const completedNumId = completedTask?.numId?.toString();
+            if (task.locked && (task.dependsOn === taskId || task.dependsOn === completedNumId)) {
               return { ...task, locked: false };
             }
             return task;
@@ -420,6 +452,12 @@ export const useAppStore = create<AppStore>()(
       // 4.9. Archivar el ciclo actual (todas las tareas) y guardar el feedback general
       archiveCurrentCycle: (generalFeedback) =>
         set((state) => {
+          const nextCycle =
+            state.currentCycle === 0 ? 1 :
+            state.currentCycle === 1 ? 2 : 
+            state.currentCycle === 2 ? 3 : 
+            1;
+
           console.log("archiveCurrentCycle called:", {
             currentTasks: state.tasks.length,
             feedbackHistoryLength: state.feedbackHistory.length,
@@ -444,6 +482,7 @@ export const useAppStore = create<AppStore>()(
                 generalFeedback: generalFeedback ?? { comment: "", rating: 0 },
               },
             ],
+            currentCycle: nextCycle,
             // NO limpiar recommendedTasks aquí si vamos a necesitarlos en el siguiente ciclo
             // recommendedTasks: [],
           };
