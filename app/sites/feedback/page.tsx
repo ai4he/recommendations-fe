@@ -112,7 +112,7 @@ function FeedbackPage() {
 
       try {
         const response = await fetch(
-          "http://13.221.139.11/api/recommend",
+          "https://rec.haielab.org/api/recommend",
           {
             method: "POST",
             headers: {
@@ -178,15 +178,15 @@ function FeedbackPage() {
           // Después del primer ciclo, reemplazar con initialTasks y ir a tasks
           console.log("replacing tasks with initialTasks", { initialTasks });
           replaceTasks(initialTasks);
-          //router.push("/sites/tasks");
-          router.push("/sites/thank-you");
+          router.push("/sites/tasks");
+          // router.push("/sites/thank-you");
         } else if (cycleNumber === 2) {
           console.log("FeedbackPage - Cycle 2: Going to suggested-skills");
           // back to the entry point page
           const entryPoint = useAppStore.getState().getEntryPoint();
           console.log("Entry point is:", entryPoint);
           if (entryPoint === "tasks") {
-            router.push("/sites/thank-you");
+            router.push("/sites/suggested-skills");
           } else if (entryPoint === "recommender1") {
             replaceTasks(advancedTasks);
             router.push("/sites/recommender1");
@@ -308,7 +308,7 @@ function FeedbackPage() {
             You haven’t completed any tasks yet.
           </p>
           <a
-            href=""
+            href="/sites/tasks"
             className="inline-block bg-black text-white px-4 py-2 rounded-md font-medium hover:bg-neutral-800 transition"
           >
             🔙 Go to Tasks
@@ -321,7 +321,7 @@ function FeedbackPage() {
             feedback.
           </p>
           <a
-            href=""
+            href="/sites/tasks"
             className="inline-block bg-black text-white px-4 py-2 rounded-md font-medium hover:bg-neutral-800 transition"
           >
             🔙 Go to Tasks

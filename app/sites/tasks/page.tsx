@@ -10,8 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Recommendation, useAppStore } from "@/hooks/useAppStore";
 import { useRouter } from "next/navigation";
-import { Clock, FileText, Lock, CheckCircle, RotateCcw } from "lucide-react";
-import { use, useEffect, useMemo, useState } from "react";
+import { Clock, FileText, Lock, CheckCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { initialTasks } from "@/data/initialTasks";
 import { advancedTasks } from "@/data/advancedTasks";
 
@@ -151,7 +151,7 @@ export default function TasksPage() {
 
   const router = useRouter();
   const resetApp = useAppStore((state) => state.resetApp);
-  const cycleNumber = useAppStore(s => s.currentCycle);
+  const cycleNumber = useAppStore((s) => s.currentCycle);
   const [isLoadingRecommendations, setIsLoadingRecommendations] =
     useState(false);
   const [isNavigatingAway, setIsNavigatingAway] = useState(false);
@@ -161,7 +161,6 @@ export default function TasksPage() {
   useEffect(() => {
     setEntryPoint("tasks");
   }, [setEntryPoint]);
-
 
   const handleStartOver = () => {
     if (
@@ -263,7 +262,7 @@ export default function TasksPage() {
 
         try {
           const response = await fetch(
-            "http://localhost:5000/api/recommend_unsupervised_with_feat",
+            "https://rec.haielab.org/api/recommend_unsupervised_with_feat",
             {
               method: "POST",
               headers: {
@@ -398,6 +397,9 @@ export default function TasksPage() {
 
   return (
     <div className="space-y-6 p-6">
+      <Button onClick={handleStartOver} className="w-full md:w-auto">
+        Start Over
+      </Button>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Available Tasks</h1>
@@ -430,11 +432,20 @@ export default function TasksPage() {
                           Recommended
                         </span>
                         <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                          Score: {recommendedTasks.find((t) => t.task === task.numId)?.score.toFixed(2)}
+                          Score:{" "}
+                          {recommendedTasks
+                            .find((t) => t.task === task.numId)
+                            ?.score.toFixed(2)}
                         </span>
-                        {recommendedTasks.find((t) => t.task === task.numId)?.top_feature && (
+                        {recommendedTasks.find((t) => t.task === task.numId)
+                          ?.top_feature && (
                           <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
-                            Picked for you because: {recommendedTasks.find((t) => t.task === task.numId)?.top_feature}
+                            Picked for you because:{" "}
+                            {
+                              recommendedTasks.find(
+                                (t) => t.task === task.numId
+                              )?.top_feature
+                            }
                           </span>
                         )}
                         {task.locked && (
@@ -497,11 +508,15 @@ export default function TasksPage() {
                     {userSkills.map(
                       (skill) =>
                         task.requiredSkills?.includes(skill) && (
-                          <li 
+                          <li
                             key={skill}
                             className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors"
                           >
-                            {userSkillsMapping[skill as keyof typeof userSkillsMapping]}
+                            {
+                              userSkillsMapping[
+                                skill as keyof typeof userSkillsMapping
+                              ]
+                            }
                           </li>
                         )
                     )}

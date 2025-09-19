@@ -304,21 +304,37 @@ export const useAppStore = create<AppStore>()(
           // Find the completed task to get its numId
           const completedTask = state.tasks.find(task => task.id === taskId);
           const completedNumId = completedTask?.numId?.toString();
-
-          // 4.4.1. Update the completed task
-          const updatedTasks = state.tasks.map((task) =>
-            task.id === taskId ? { ...task, completed: true } : task
-          );
-
-          // 4.4.2. Unlock tasks that depend on this task (check both id and numId)
-          const unlockedTasks = updatedTasks.map((task) => {
-            if (task.locked && (task.dependsOn === taskId || task.dependsOn === completedNumId)) {
-              return { ...task, locked: false };
+          
+          // Update the completed task and unlock any dependent tasks
+          const updatedTasks = state.tasks.map((task) => {
+            // Mark the current task as completed
+            if (task.id === taskId) {
+              return { ...task, completed: true };
             }
+            
+            // Check if this task is locked and depends on the completed task
+            if (task.locked && task.dependsOn) {
+              // Check both string and number representations of the dependency
+              const dependsOnNumId = task.dependsOn.toString();
+              const completedTaskNumIdStr = completedNumId?.toString();
+              const completedTaskIdStr = taskId.toString();
+              
+              // Unlock if the task depends on the completed task by ID or numId
+              if (dependsOnNumId === completedTaskIdStr || 
+                  dependsOnNumId === completedTaskNumIdStr) {
+                console.log(`[completeTask] Unlocking task ${task.id} (${task.numId}) that depends on ${taskId} (${completedNumId})`);
+                return { ...task, locked: false };
+              }
+            }
+            
             return task;
           });
-
-          return { tasks: unlockedTasks };
+          
+          console.log('[completeTask] Tasks after unlocking:', updatedTasks.map(t => 
+            `${t.id} (${t.numId}): ${t.name} - locked: ${t.locked}, dependsOn: ${t.dependsOn}`
+          ));
+          
+          return { tasks: updatedTasks };
         }),
 
       // 4.5. Desbloquear manualmente una tarea sin marcar completada
@@ -333,7 +349,13 @@ export const useAppStore = create<AppStore>()(
       //      luego desbloquear dependientes
       uploadTaskFile: (taskId, taskNumId, url, submissionType) =>
         set((state) => {
+          // First, find the completed task to get its numId
+          const completedTask = state.tasks.find(t => t.id === taskId);
+          const completedNumId = completedTask?.numId?.toString();
+          
+          // Update the completed task and unlock any dependent tasks
           const updatedTasks = state.tasks.map((task) => {
+            // Mark the current task as completed
             if (task.id === taskId) {
               return {
                 ...task,
@@ -342,14 +364,29 @@ export const useAppStore = create<AppStore>()(
                 submissionType,
               };
             }
-            // If this task depends on the recently completed one (by id or numId), we unlock it
-            const completedTask = state.tasks.find(t => t.id === taskId);
-            const completedNumId = completedTask?.numId?.toString();
-            if (task.locked && (task.dependsOn === taskId || task.dependsOn === completedNumId)) {
-              return { ...task, locked: false };
+            
+            // Check if this task is locked and depends on the completed task
+            if (task.locked && task.dependsOn) {
+              // Check both string and number representations of the dependency
+              const dependsOnNumId = task.dependsOn.toString();
+              const completedTaskNumIdStr = completedNumId?.toString();
+              const completedTaskIdStr = taskId.toString();
+              
+              // Unlock if the task depends on the completed task by ID or numId
+              if (dependsOnNumId === completedTaskIdStr || 
+                  dependsOnNumId === completedTaskNumIdStr) {
+                console.log(`Unlocking task ${task.id} (${task.numId}) that depends on ${taskId} (${completedNumId})`);
+                return { ...task, locked: false };
+              }
             }
+            
             return task;
           });
+          
+          console.log('Tasks after unlocking:', updatedTasks.map(t => 
+            `${t.id} (${t.numId}): ${t.name} - locked: ${t.locked}, dependsOn: ${t.dependsOn}`
+          ));
+          
           return { tasks: updatedTasks };
         }),
 
